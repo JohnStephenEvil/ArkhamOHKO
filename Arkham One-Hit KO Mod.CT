@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>26751</ID>
+      <Description>"Enable"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+define(steam,"BatmanAC.exe"+37097)
+define(epic,"BatmanAC.exe"+36207)
+
+{$lua}
+
+if autoAssemble([[
+  define(steam,"BatmanAC.exe"+37097)
+  define(check_bytes,29 03 8B 1B 8B 4C 24 14)
+  assert(steam,check_bytes)
+]]) then
+  return [[define(damage_address,steam)]]
+end
+
+if autoAssemble([[
+  define(epic,"BatmanAC.exe"+36207)
+  define(check_bytes,29 03 8B 1B 8B 4C 24 14)
+  assert(epic,check_bytes)
+]]) then
+  return [[define(damage_address,epic)]]
+end
+
+{$asm}
+
+alloc(health_mem,$1000)
+
+label(originalcode)
+label(return)
+label(player)
+label(times_died)
+label(grundy)
+label(kill)
+label(cleanup)
+
+health_mem+400:
+player:
+  dd 0
+times_died:
+  dd 0
+
+health_mem:
+  pushf
+  cmp [ebx+74],#555  // Is Batman or Catwoman?
+  jne originalcode
+  cmp eax,0          // Check if actually taking damage
+  je originalcode
+  cmp [edi+1CC],0    // Check if already dead. Fix Freeze crashing, he kills you 6 times with one shot
+  je originalcode
+  mov [player],edi   // Store EDI, PawnPlayer
+  mov edi,[edi+1CC]  // Controller
+  mov edi,[edi+C0]   // WorldInfo
+  mov edi,[edi+484]  // GameInfo
+  mov edi,[edi+348]  // PersistentData
+  mov edi,[edi+98]   // CurrentLevel String
+  cmp edi,0          // Check if CurrentLevel has a value
+  je kill
+  cmp [edi],0075004D // Grundy arena, Museum_S2
+  jne kill
+  cmp [edi+4],00650073 // se
+  jne kill
+  cmp [edi+8],006D0075 // um
+  jne kill
+  cmp [edi+C],0053005F // _S
+  jne kill
+  cmp [edi+10],00000032 // 2
+  jne kill
+grundy:
+  cmp eax,2
+  je cleanup
+kill:
+  mov eax,[ebx]
+  add [times_died],1
+cleanup:
+  mov edi,[player]   // Restore EDI
+originalcode:
+  popf
+  sub [ebx],eax
+  mov ebx,[ebx]
+  mov ecx,[esp+14]
+  jmp return
+
+damage_address:
+  jmp health_mem
+  nop 3
+return:
+registersymbol(damage_address)
+registersymbol(times_died)
+
+[DISABLE]
+
+damage_address:
+  db 29 03 8B 1B 8B 4C 24 14
+
+unregistersymbol(times_died)
+unregistersymbol(damage_address)
+dealloc(health_mem)
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26750</ID>
+      <Description>"Number of Deaths"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>times_died</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>
+</LuaScript>
+</CheatTable>
