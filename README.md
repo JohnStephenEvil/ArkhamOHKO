@@ -1,7 +1,8 @@
 # Arkham One-Hit KO Mod
 
 This is a cheat table for the Arkham games to make Batman die in one hit.  
-Currently only supports Arkham City.
+Fully supports Arkham City.  
+Initial support for Arkham Origins has been added, but needs testing.
 
 ## How To Use:
 Install [Cheat Engine](https://www.cheatengine.org/) (Read the installer, it has a bunch of optional garbage)  
