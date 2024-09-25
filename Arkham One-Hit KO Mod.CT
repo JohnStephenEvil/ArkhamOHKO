@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>26753</ID>
+      <Description>"Enable"</Description>
+      <Options moAlwaysHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>26748</ID>
+          <Description>"City (Steam)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+//aobscanmodule(damage_address,BatmanAC.exe,29 03 8B 1B 8B 4C 24 14)
+assert(BatmanAC.exe+37097,29 03 8B 1B 8B 4C 24 14)
+define(damage_address,BatmanAC.exe+37097)
+alloc(health_mem,$1000)
+
+label(originalcode)
+label(return)
+label(player)
+label(times_died)
+label(grundy)
+label(kill)
+label(cleanup)
+
+health_mem+400:
+player:
+  dd 0
+times_died:
+  dd 0
+
+health_mem:
+  pushf
+  cmp [ebx+74],#555  // Is Batman or Catwoman?
+  jne originalcode
+  cmp eax,0          // Check if actually taking damage
+  je originalcode
+  cmp [edi+1CC],0    // Check if already dead. Fix Freeze crashing, he kills you 6 times with one shot
+  je originalcode
+  mov [player],edi   // Store EDI, PawnPlayer
+  mov edi,[edi+1CC]  // Controller
+  mov edi,[edi+C0]   // WorldInfo
+  mov edi,[edi+484]  // GameInfo
+  mov edi,[edi+348]  // PersistentData
+  mov edi,[edi+98]   // CurrentLevel String
+  cmp edi,0          // Check if CurrentLevel has a value
+  je kill
+  cmp [edi],0075004D // Grundy arena, Museum_S2
+  jne kill
+  cmp [edi+4],00650073 // se
+  jne kill
+  cmp [edi+8],006D0075 // um
+  jne kill
+  cmp [edi+C],0053005F // _S
+  jne kill
+  cmp [edi+10],00000032 // 2
+  jne kill
+grundy:
+  cmp eax,2
+  je cleanup
+kill:
+  mov eax,[ebx]
+  add [times_died],1
+cleanup:
+  mov edi,[player]   // Restore EDI
+originalcode:
+  popf
+  sub [ebx],eax
+  mov ebx,[ebx]
+  mov ecx,[esp+14]
+  jmp return
+
+damage_address:
+  jmp health_mem
+  nop 3
+return:
+registersymbol(damage_address)
+registersymbol(times_died)
+
+[DISABLE]
+
+damage_address:
+  db 29 03 8B 1B 8B 4C 24 14
+
+unregistersymbol(times_died)
+unregistersymbol(damage_address)
+dealloc(health_mem)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26749</ID>
+          <Description>"City (Epic)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+//aobscanmodule(damage_address,BatmanAC.exe,29 03 8B 1B 8B 4C 24 14)
+assert(BatmanAC.exe+36207,29 03 8B 1B 8B 4C 24 14)
+define(damage_address,BatmanAC.exe+36207)
+alloc(health_mem,$1000)
+
+label(originalcode)
+label(return)
+label(player)
+label(times_died)
+label(grundy)
+label(kill)
+label(cleanup)
+
+health_mem+400:
+player:
+  dd 0
+times_died:
+  dd 0
+
+health_mem:
+  pushf
+  cmp [ebx+74],#555  // Is Batman or Catwoman?
+  jne originalcode
+  cmp eax,0          // Check if actually taking damage
+  je originalcode
+  cmp [edi+1CC],0    // Check if already dead. Fix Freeze crashing, he kills you 6 times with one shot
+  je originalcode
+  mov [player],edi   // Store EDI, PawnPlayer
+  mov edi,[edi+1CC]  // Controller
+  mov edi,[edi+C0]   // WorldInfo
+  mov edi,[edi+484]  // GameInfo
+  mov edi,[edi+348]  // PersistentData
+  mov edi,[edi+98]   // CurrentLevel String
+  cmp edi,0          // Check if CurrentLevel has a value
+  je kill
+  cmp [edi],0075004D // Grundy arena, Museum_S2
+  jne kill
+  cmp [edi+4],00650073 // se
+  jne kill
+  cmp [edi+8],006D0075 // um
+  jne kill
+  cmp [edi+C],0053005F // _S
+  jne kill
+  cmp [edi+10],00000032 // 2
+  jne kill
+grundy:
+  cmp eax,2
+  je cleanup
+kill:
+  mov eax,[ebx]      // Replace damage value with current health
+  add [times_died],1 // Increment times died by 1
+cleanup:
+  mov edi,[player]   // Restore EDI
+originalcode:
+  popf
+  sub [ebx],eax
+  mov ebx,[ebx]
+  mov ecx,[esp+14]
+  jmp return
+
+damage_address:
+  jmp health_mem
+  nop 3
+return:
+registersymbol(damage_address)
+registersymbol(times_died)
+
+[DISABLE]
+
+damage_address:
+  db 29 03 8B 1B 8B 4C 24 14
+
+unregistersymbol(times_died)
+unregistersymbol(damage_address)
+dealloc(health_mem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: BatmanAC.exe+36207
+
+BatmanAC.exe+361EB: 8B 46 10           - mov eax,[esi+10]
+BatmanAC.exe+361EE: 80 38 41           - cmp byte ptr [eax],41
+BatmanAC.exe+361F1: 75 10              - jne BatmanAC.exe+36203
+BatmanAC.exe+361F3: 8B 4E 0C           - mov ecx,[esi+0C]
+BatmanAC.exe+361F6: 6A 00              - push 00
+BatmanAC.exe+361F8: 40                 - inc eax
+BatmanAC.exe+361F9: 56                 - push esi
+BatmanAC.exe+361FA: 89 46 10           - mov [esi+10],eax
+BatmanAC.exe+361FD: FF 15 B4 F4 59 01  - call dword ptr [BatmanAC.exe+119F4B4]
+BatmanAC.exe+36203: 8B 44 24 10        - mov eax,[esp+10]
+// ---------- INJECTING HERE ----------
+BatmanAC.exe+36207: 29 03              - sub [ebx],eax
+// ---------- DONE INJECTING  ----------
+BatmanAC.exe+36209: 8B 1B              - mov ebx,[ebx]
+BatmanAC.exe+3620B: 8B 4C 24 14        - mov ecx,[esp+14]
+BatmanAC.exe+3620F: 5E                 - pop esi
+BatmanAC.exe+36210: 89 19              - mov [ecx],ebx
+BatmanAC.exe+36212: 5B                 - pop ebx
+BatmanAC.exe+36213: 59                 - pop ecx
+BatmanAC.exe+36214: C2 08 00           - ret 0008
+BatmanAC.exe+36217: CC                 - int 3
+BatmanAC.exe+36218: CC                 - int 3
+BatmanAC.exe+36219: CC                 - int 3
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26752</ID>
+          <Description>"Origins"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+assert("BatmanOrigins.exe"+31FD7,29 03 8B 1B 8B 4C 24 14)
+define(damage_address,"BatmanOrigins.exe"+31FD7)
+alloc(health_mem,$1000)
+
+label(originalcode)
+label(return)
+label(times_died)
+label(kill)
+
+health_mem+400:
+times_died:
+  dd 0
+
+health_mem:
+  pushf
+  cmp [ebx+74],#555 // Is Batman?
+  jne originalcode
+  cmp eax,0         // Check if actually taking damage
+  je originalcode
+  cmp [edi+1CC],0   // Check if already dead
+  je originalcode
+kill:
+  mov eax,[ebx]
+  add [times_died],1
+originalcode:
+  popf
+  sub [ebx],eax
+  mov ebx,[ebx]
+  mov ecx,[esp+14]
+  jmp return
+
+damage_address:
+  jmp health_mem
+  nop 3
+return:
+registersymbol(damage_address)
+registersymbol(times_died)
+
+[DISABLE]
+
+damage_address:
+  db 29 03 8B 1B 8B 4C 24 14
+
+unregistersymbol(times_died)
+unregistersymbol(damage_address)
+dealloc(health_mem)
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26750</ID>
+      <Description>"Number of Deaths"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>times_died</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
