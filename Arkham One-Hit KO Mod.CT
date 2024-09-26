@@ -4,11 +4,41 @@
     <CheatEntry>
       <ID>26753</ID>
       <Description>"Enable"</Description>
-      <Options moAlwaysHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <Options moAlwaysHideChildren="1"/>
       <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+local city_process = getProcessIDFromProcessName("BatmanAC.exe")
+local origins_process = getProcessIDFromProcessName("BatmanOrigins.exe")
+
+local function timer_tick(timer)
+  getAddressList().getMemoryRecordByDescription('Enable').Active=false
+  timer.destroy()
+end
+
+local timer = createTimer(getMainForm(),false)
+timer.Interval = 10
+timer.OnTimer = timer_tick
+
+if city_process then
+  openProcess("BatmanAC.exe")
+  getAddressList().getMemoryRecordByDescription('City (Steam)').Active=true
+  getAddressList().getMemoryRecordByDescription('City (Epic)').Active=true
+elseif origins_process then
+  openProcess("BatmanOrigins.exe")
+  getAddressList().getMemoryRecordByDescription('Origins').Active=true
+else
+  timer.Enabled=true
+end
 
 [DISABLE]
+
+getAddressList().getMemoryRecordByDescription('City (Steam)').Active=false
+getAddressList().getMemoryRecordByDescription('City (Epic)').Active=false
+getAddressList().getMemoryRecordByDescription('Origins').Active=false
 
 </AssemblerScript>
       <CheatEntries>
@@ -18,7 +48,6 @@
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
-//aobscanmodule(damage_address,BatmanAC.exe,29 03 8B 1B 8B 4C 24 14)
 assert(BatmanAC.exe+37097,29 03 8B 1B 8B 4C 24 14)
 define(damage_address,BatmanAC.exe+37097)
 alloc(health_mem,$1000)
@@ -102,7 +131,6 @@ dealloc(health_mem)
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
-//aobscanmodule(damage_address,BatmanAC.exe,29 03 8B 1B 8B 4C 24 14)
 assert(BatmanAC.exe+36207,29 03 8B 1B 8B 4C 24 14)
 define(damage_address,BatmanAC.exe+36207)
 alloc(health_mem,$1000)
@@ -178,33 +206,6 @@ unregistersymbol(times_died)
 unregistersymbol(damage_address)
 dealloc(health_mem)
 
-{
-// ORIGINAL CODE - INJECTION POINT: BatmanAC.exe+36207
-
-BatmanAC.exe+361EB: 8B 46 10           - mov eax,[esi+10]
-BatmanAC.exe+361EE: 80 38 41           - cmp byte ptr [eax],41
-BatmanAC.exe+361F1: 75 10              - jne BatmanAC.exe+36203
-BatmanAC.exe+361F3: 8B 4E 0C           - mov ecx,[esi+0C]
-BatmanAC.exe+361F6: 6A 00              - push 00
-BatmanAC.exe+361F8: 40                 - inc eax
-BatmanAC.exe+361F9: 56                 - push esi
-BatmanAC.exe+361FA: 89 46 10           - mov [esi+10],eax
-BatmanAC.exe+361FD: FF 15 B4 F4 59 01  - call dword ptr [BatmanAC.exe+119F4B4]
-BatmanAC.exe+36203: 8B 44 24 10        - mov eax,[esp+10]
-// ---------- INJECTING HERE ----------
-BatmanAC.exe+36207: 29 03              - sub [ebx],eax
-// ---------- DONE INJECTING  ----------
-BatmanAC.exe+36209: 8B 1B              - mov ebx,[ebx]
-BatmanAC.exe+3620B: 8B 4C 24 14        - mov ecx,[esp+14]
-BatmanAC.exe+3620F: 5E                 - pop esi
-BatmanAC.exe+36210: 89 19              - mov [ecx],ebx
-BatmanAC.exe+36212: 5B                 - pop ebx
-BatmanAC.exe+36213: 59                 - pop ecx
-BatmanAC.exe+36214: C2 08 00           - ret 0008
-BatmanAC.exe+36217: CC                 - int 3
-BatmanAC.exe+36218: CC                 - int 3
-BatmanAC.exe+36219: CC                 - int 3
-}
 </AssemblerScript>
         </CheatEntry>
         <CheatEntry>
