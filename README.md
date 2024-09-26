@@ -8,3 +8,7 @@ Initial support for Arkham Origins has been added, but needs testing.
 Install [Cheat Engine](https://www.cheatengine.org/) (Read the installer, it has a bunch of optional garbage)  
 Download and run the cheat table (Arkham One-Hit KO Mod.CT)  
 Click Enable in the cheat table
+
+## Known Issues
+Having armor upgrades allows you to take damage without dying until the armor is gone.  
+For City, just don't buy armor upgrades. For Origins, this is a problem that needs to be fixed.
