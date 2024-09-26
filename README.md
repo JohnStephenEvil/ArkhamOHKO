@@ -7,5 +7,4 @@ Initial support for Arkham Origins has been added, but needs testing.
 ## How To Use:
 Install [Cheat Engine](https://www.cheatengine.org/) (Read the installer, it has a bunch of optional garbage)  
 Download and run the cheat table (Arkham One-Hit KO Mod.CT)  
-Run the game and [attach cheat engine](https://wiki.cheatengine.org/index.php?title=Tutorials:AttachToProcess) to it  
 Click Enable in the cheat table
