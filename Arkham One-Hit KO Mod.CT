@@ -5,12 +5,14 @@
       <ID>26753</ID>
       <Description>"Enable"</Description>
       <Options moAlwaysHideChildren="1"/>
+      <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>{$lua}
 if syntaxcheck then return end
 
 [ENABLE]
 
+local asylum_process = getProcessIDFromProcessName("ShippingPC-BmGame.exe")
 local city_process = getProcessIDFromProcessName("BatmanAC.exe")
 local origins_process = getProcessIDFromProcessName("BatmanOrigins.exe")
 
@@ -20,10 +22,18 @@ local function timer_tick(timer)
 end
 
 local timer = createTimer(getMainForm(),false)
-timer.Interval = 10
+timer.Interval = 100
 timer.OnTimer = timer_tick
 
-if city_process then
+getAddressList().getMemoryRecordByDescription('Asylum').Active=false
+getAddressList().getMemoryRecordByDescription('City (Steam)').Active=false
+getAddressList().getMemoryRecordByDescription('City (Epic)').Active=false
+getAddressList().getMemoryRecordByDescription('Origins').Active=false
+
+if asylum_process then
+  openProcess("ShippingPC-BmGame.exe")
+  getAddressList().getMemoryRecordByDescription('Asylum').Active=true
+elseif city_process then
   openProcess("BatmanAC.exe")
   getAddressList().getMemoryRecordByDescription('City (Steam)').Active=true
   getAddressList().getMemoryRecordByDescription('City (Epic)').Active=true
@@ -36,6 +46,7 @@ end
 
 [DISABLE]
 
+getAddressList().getMemoryRecordByDescription('Asylum').Active=false
 getAddressList().getMemoryRecordByDescription('City (Steam)').Active=false
 getAddressList().getMemoryRecordByDescription('City (Epic)').Active=false
 getAddressList().getMemoryRecordByDescription('Origins').Active=false
@@ -43,8 +54,64 @@ getAddressList().getMemoryRecordByDescription('Origins').Active=false
 </AssemblerScript>
       <CheatEntries>
         <CheatEntry>
+          <ID>26754</ID>
+          <Description>"Asylum"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(damage_aob,ShippingPC-BmGame.exe,8B 44 24 10 29 03 8B 1B 8B 4C 24 14)
+alloc(health_mem,$1000)
+
+label(code)
+label(return)
+label(times_died)
+label(kill)
+
+health_mem+400:
+times_died:
+  dd 0
+
+health_mem:
+  pushf
+  cmp [ebx+42C],(float)900 // Is Batman? (Batman's glide speed)
+  jne code
+  cmp eax,0 // Check if actually taking damage
+  je code
+  cmp [edi+1CC],0 // Check if already dead
+  je code
+kill:
+  mov eax,[ebx]
+  add [times_died],1
+code:
+  popf
+  sub [ebx],eax
+  mov ebx,[ebx]
+  mov ecx,[esp+14]
+  jmp return
+
+damage_aob+4:
+  jmp health_mem
+  nop 3
+return:
+registersymbol(damage_aob)
+registersymbol(times_died)
+
+[DISABLE]
+
+damage_aob+4:
+  db 29 03 8B 1B 8B 4C 24 14
+
+unregistersymbol(times_died)
+unregistersymbol(damage_aob)
+dealloc(health_mem)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
           <ID>26748</ID>
           <Description>"City (Steam)"</Description>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
@@ -128,6 +195,7 @@ dealloc(health_mem)
         <CheatEntry>
           <ID>26749</ID>
           <Description>"City (Epic)"</Description>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
@@ -211,6 +279,7 @@ dealloc(health_mem)
         <CheatEntry>
           <ID>26752</ID>
           <Description>"Origins"</Description>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
