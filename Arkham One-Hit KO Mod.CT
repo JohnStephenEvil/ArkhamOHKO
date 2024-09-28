@@ -73,7 +73,7 @@ health_mem:
   jne code
   cmp eax,0 // Check if actually taking damage
   je code
-  cmp [edi+1CC],0 // Check if already dead
+  cmp [edi+1B4],0 // Check if already dead
   je code
 kill:
   mov eax,[ebx]
@@ -210,7 +210,7 @@ health_mem:
   jne originalcode
   cmp eax,0         // Check if actually taking damage
   je originalcode
-  cmp [edi+1CC],0   // Check if already dead
+  cmp [edi+1E4],0   // Check if already dead
   je originalcode
 kill:
   mov eax,[ebx]
