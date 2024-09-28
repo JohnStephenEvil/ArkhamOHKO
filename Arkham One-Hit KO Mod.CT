@@ -5,7 +5,6 @@
       <ID>26753</ID>
       <Description>"Enable"</Description>
       <Options moAlwaysHideChildren="1"/>
-      <LastState/>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26,8 +25,7 @@ timer.Interval = 100
 timer.OnTimer = timer_tick
 
 getAddressList().getMemoryRecordByDescription('Asylum').Active=false
-getAddressList().getMemoryRecordByDescription('City (Steam)').Active=false
-getAddressList().getMemoryRecordByDescription('City (Epic)').Active=false
+getAddressList().getMemoryRecordByDescription('City').Active=false
 getAddressList().getMemoryRecordByDescription('Origins').Active=false
 
 if asylum_process then
@@ -35,8 +33,7 @@ if asylum_process then
   getAddressList().getMemoryRecordByDescription('Asylum').Active=true
 elseif city_process then
   openProcess("BatmanAC.exe")
-  getAddressList().getMemoryRecordByDescription('City (Steam)').Active=true
-  getAddressList().getMemoryRecordByDescription('City (Epic)').Active=true
+  getAddressList().getMemoryRecordByDescription('City').Active=true
 elseif origins_process then
   openProcess("BatmanOrigins.exe")
   getAddressList().getMemoryRecordByDescription('Origins').Active=true
@@ -47,8 +44,7 @@ end
 [DISABLE]
 
 getAddressList().getMemoryRecordByDescription('Asylum').Active=false
-getAddressList().getMemoryRecordByDescription('City (Steam)').Active=false
-getAddressList().getMemoryRecordByDescription('City (Epic)').Active=false
+getAddressList().getMemoryRecordByDescription('City').Active=false
 getAddressList().getMemoryRecordByDescription('Origins').Active=false
 
 </AssemblerScript>
@@ -56,7 +52,6 @@ getAddressList().getMemoryRecordByDescription('Origins').Active=false
         <CheatEntry>
           <ID>26754</ID>
           <Description>"Asylum"</Description>
-          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
@@ -109,98 +104,12 @@ dealloc(health_mem)
 </AssemblerScript>
         </CheatEntry>
         <CheatEntry>
-          <ID>26748</ID>
-          <Description>"City (Steam)"</Description>
-          <LastState/>
-          <VariableType>Auto Assembler Script</VariableType>
-          <AssemblerScript>[ENABLE]
-
-assert(BatmanAC.exe+37097,29 03 8B 1B 8B 4C 24 14)
-define(damage_address,BatmanAC.exe+37097)
-alloc(health_mem,$1000)
-
-label(originalcode)
-label(return)
-label(player)
-label(times_died)
-label(grundy)
-label(kill)
-label(cleanup)
-
-health_mem+400:
-player:
-  dd 0
-times_died:
-  dd 0
-
-health_mem:
-  pushf
-  cmp [ebx+74],#555  // Is Batman or Catwoman?
-  jne originalcode
-  cmp eax,0          // Check if actually taking damage
-  je originalcode
-  cmp [edi+1CC],0    // Check if already dead. Fix Freeze crashing, he kills you 6 times with one shot
-  je originalcode
-  mov [player],edi   // Store EDI, PawnPlayer
-  mov edi,[edi+1CC]  // Controller
-  mov edi,[edi+C0]   // WorldInfo
-  mov edi,[edi+484]  // GameInfo
-  mov edi,[edi+348]  // PersistentData
-  mov edi,[edi+98]   // CurrentLevel String
-  cmp edi,0          // Check if CurrentLevel has a value
-  je kill
-  cmp [edi],0075004D // Grundy arena, Museum_S2
-  jne kill
-  cmp [edi+4],00650073 // se
-  jne kill
-  cmp [edi+8],006D0075 // um
-  jne kill
-  cmp [edi+C],0053005F // _S
-  jne kill
-  cmp [edi+10],00000032 // 2
-  jne kill
-grundy:
-  cmp eax,2
-  je cleanup
-kill:
-  mov eax,[ebx]
-  add [times_died],1
-cleanup:
-  mov edi,[player]   // Restore EDI
-originalcode:
-  popf
-  sub [ebx],eax
-  mov ebx,[ebx]
-  mov ecx,[esp+14]
-  jmp return
-
-damage_address:
-  jmp health_mem
-  nop 3
-return:
-registersymbol(damage_address)
-registersymbol(times_died)
-
-[DISABLE]
-
-damage_address:
-  db 29 03 8B 1B 8B 4C 24 14
-
-unregistersymbol(times_died)
-unregistersymbol(damage_address)
-dealloc(health_mem)
-
-</AssemblerScript>
-        </CheatEntry>
-        <CheatEntry>
           <ID>26749</ID>
-          <Description>"City (Epic)"</Description>
-          <LastState/>
+          <Description>"City"</Description>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
-assert(BatmanAC.exe+36207,29 03 8B 1B 8B 4C 24 14)
-define(damage_address,BatmanAC.exe+36207)
+aobscanmodule(damage_aob,BatmanAC.exe,8B 44 24 10 29 03 8B 1B 8B 4C 24 14)
 alloc(health_mem,$1000)
 
 label(originalcode)
@@ -258,20 +167,20 @@ originalcode:
   mov ecx,[esp+14]
   jmp return
 
-damage_address:
+damage_aob+4:
   jmp health_mem
   nop 3
 return:
-registersymbol(damage_address)
+registersymbol(damage_aob)
 registersymbol(times_died)
 
 [DISABLE]
 
-damage_address:
+damage_aob+4:
   db 29 03 8B 1B 8B 4C 24 14
 
 unregistersymbol(times_died)
-unregistersymbol(damage_address)
+unregistersymbol(damage_aob)
 dealloc(health_mem)
 
 </AssemblerScript>
@@ -279,7 +188,6 @@ dealloc(health_mem)
         <CheatEntry>
           <ID>26752</ID>
           <Description>"Origins"</Description>
-          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 
